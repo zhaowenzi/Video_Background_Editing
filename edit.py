@@ -11,22 +11,32 @@ fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 out = cv2.VideoWriter('test.avi', fourcc, 25.0, (1080, 1920), True)
 
 def replace_and_blend(frame, mask):
-	
 	size = frame.shape
-	rows = size[0]
-	cols = size[1]
 
 	result = np.zeros(size, dtype=frame.dtype)
-	for x in range(rows):
-		for y in range(cols):
-			if (mask[x][y] == 255):
-				result[x][y] = background[x][y]
-			elif (mask[x][y] == 0):
-				result[x][y] = frame[x][y]
-			else:
-				m = mask[x][y]
-				w = m / 255.0
-				result[x][y] = w * background[x][y] + (1 - w) * frame[x][y]
+	mask_0 = np.where(mask == 0)
+	mask_255 = np.where(mask == 255)
+	mask_other = np.where((mask != 0) & (mask != 255))
+	result[mask_0] = frame[mask_0]
+	result[mask_255] = background[mask_255]
+	result[mask_other] = (background[mask_other] + frame[mask_other]) / 2.0
+
+	
+	# size = frame.shape
+	# rows = size[0]
+	# cols = size[1]
+
+	# result = np.zeros(size, dtype=frame.dtype)
+	# for x in range(rows):
+	# 	for y in range(cols):
+	# 		if (mask[x][y] == 255):
+	# 			result[x][y] = background[x][y]
+	# 		elif (mask[x][y] == 0):
+	# 			result[x][y] = frame[x][y]
+	# 		else:
+	# 			m = mask[x][y]
+	# 			w = m / 255.0
+	# 			result[x][y] = w * background[x][y] + (1 - w) * frame[x][y]
 
 	return result
 
