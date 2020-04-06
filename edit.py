@@ -8,7 +8,7 @@ capture = cv2.VideoCapture("./kouxiang/lv/1.mp4")
 
 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 
-out = cv2.VideoWriter('test.avi', fourcc, 25.0, (1080, 1920), True)
+out = cv2.VideoWriter('test_open.avi', fourcc, 25.0, (1080, 1920), True)
 
 def replace_and_blend(frame, mask):
 	size = frame.shape
@@ -19,7 +19,12 @@ def replace_and_blend(frame, mask):
 	mask_other = np.where((mask != 0) & (mask != 255))
 	result[mask_0] = frame[mask_0]
 	result[mask_255] = background[mask_255]
-	result[mask_other] = (background[mask_other] + frame[mask_other]) / 2.0
+
+	# 下面可以性能提升
+	w = mask / 255.0
+	part_1 = np.multiply(background * w)
+	part_2 = np.multiply(frame * (1 - w))
+	result[mask_other] = part_1[mask_other] + part_2[mask_other]
 
 	
 	# size = frame.shape
@@ -60,7 +65,7 @@ while(capture.isOpened()):
 		end = time.clock()
 		print("hernel", end - start)
 		start = time.clock()
-		mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
+		mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 		end = time.clock()
 		print("mask", end - start)
 		start = time.clock()
