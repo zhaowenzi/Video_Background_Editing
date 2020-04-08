@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import time
 
+start_time = time.clock()
+
 background = cv2.imread("../kouxiang/kouxiang/timg.jpeg")
 
 capture = cv2.VideoCapture("../kouxiang/kouxiang/lv/1.mp4")
@@ -58,41 +60,16 @@ n = 0
 while(capture.isOpened()):
 	ret, frame = capture.read()
 	if ret == True:
-		print(n)
-		n = n + 1
-		start = time.clock()
 		hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-		end = time.clock()
-		print("hsv_frame", end - start)
-		start = time.clock()
 		mask = cv2.inRange(hsv_frame, np.array([35, 43, 46]), np.array([77, 255, 255]))
 		# mask = cv2.inRange(hsv_frame, np.array([100, 43, 46]), np.array([124, 255, 255]))
-		end = time.clock()
-		print("mask", end - start)
-		start = time.clock()
 		kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
-		end = time.clock()
-		print("hernel", end - start)
-		start = time.clock()
 		mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 		mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-		end = time.clock()
-		print("mask", end - start)
-		start = time.clock()
 		mask = cv2.GaussianBlur(mask, (3,3), 1)
 		mask = cv2.medianBlur(mask, 5)
-		end = time.clock()
-		print("mask", end - start)
-		start = time.clock()
-
 		result = replace_and_blend(frame, mask)
-		end = time.clock()
-		print("result", end - start)
-		start = time.clock()
 		out.write(result)
-		end = time.clock()
-		print("out", end - start)
-
 
 	else: # 读到末尾
 		break
@@ -100,5 +77,7 @@ while(capture.isOpened()):
 capture.release()
 out.release()
 
+end_time = time.clock()
 
+print(end_time - start_time)
 
