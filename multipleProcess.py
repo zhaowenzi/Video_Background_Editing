@@ -49,6 +49,8 @@ if __name__ == '__main__':
 			break
 	end_time = time.clock()
 	print(end_time -start_time)
+	frame1 = frames[0:101]
+	frame1 = frames[101:101]
 	pool = mul.Pool(10)
 	rel = pool.map(f, frames)
 	fourcc = cv2.VideoWriter_fourcc(*'MJPG')
